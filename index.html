@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WinCash</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --background-color: #f0f0f0;
+            --text-color: #333;
+            --card-bg: #fff;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --error-color: #f44336;
+        }
+
+        [data-theme="dark"] {
+            --primary-color: #45a049;
+            --background-color: #1a1a1a;
+            --text-color: #fff;
+            --card-bg: #2d2d2d;
+            --shadow-color: rgba(255, 255, 255, 0.1);
+            --error-color: #f44336;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cairo', Arial, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            transition: background-color 0.3s ease;
+        }
+
+        .theme-toggle {
+            position: relative;
+            background-color: var(--card-bg);
+            border: 2px solid var(--primary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-color);
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: 0 2px 10px var(--shadow-color);
+            transition: all 0.3s ease;
+            padding: 0;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px var(--shadow-color);
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .theme-toggle i {
+            font-size: 1.2rem;
+            transition: transform 0.5s ease;
+        }
+
+        .theme-toggle:hover i {
+            transform: rotate(360deg);
+        }
+
+        .login-header, .user-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            position: relative;
+            padding: 0 10px;
+        }
+
+        .login-header h1, .user-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .container {
+            padding: 20px;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            box-shadow: 0 4px 15px var(--shadow-color);
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        h1 {
+            color: var(--text-color);
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .input-group i {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            z-index: 1;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 45px 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1rem;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+            outline: none;
+        }
+
+        .input-group input::placeholder {
+            color: #999;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus::placeholder {
+            opacity: 0.7;
+        }
+
+        /* تحسين مظهر حقول الإدخال في الوضع المظلم */
+        [data-theme="dark"] .input-group input {
+            border-color: #444;
+            background-color: #333;
+        }
+
+        [data-theme="dark"] .input-group input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+        }
+
+        [data-theme="dark"] .input-group input::placeholder {
+            color: #777;
+        }
+
+        /* تحسين مظهر حقل الرقم */
+        /* .input-group input[type="number"] {
+            -moz-appearance: textfield;
+        } */
+
+        .input-group input[type="number"]::-webkit-outer-spin-button,
+        .input-group input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* تحسين حالة الخطأ */
+        .input-group.error input {
+            border-color: var(--error-color);
+        }
+
+        .input-group.error i {
+            color: var(--error-color);
+        }
+
+        .error-message {
+            font-size: 0.85rem;
+            margin-top: 5px;
+            display: block;
+            transition: all 0.3s ease;
+        }
+
+        /* تحسين المظهر على الموبايل */
+        @media (max-width: 480px) {
+            .input-group {
+                margin-bottom: 15px;
+            }
+
+            .input-group input {
+                padding: 10px 40px 10px 12px;
+                font-size: 0.95rem;
+            }
+
+            .input-group i {
+                font-size: 1.1rem;
+                right: 12px;
+            }
+        }
+
+        .balance-amount i {
+            margin-right: 5px;
+            color: var(--primary-color);
+        }
+
+        .timer-icon {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: white;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .section-title i {
+            color: var(--primary-color);
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            width: 100%;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #45a049;
+            transform: scale(1.02);
+        }
+
+        .balance-card {
+            text-align: center;
+            padding: 25px;
+            position: relative;
+        }
+
+        .balance-amount {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin: 15px 0;
+        }
+
+        .timer-card {
+            text-align: center;
+            background: linear-gradient(135deg, var(--primary-color), #2196F3);
+            color: white;
+        }
+
+        #timer {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .progress {
+            width: 0%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 5px;
+            transition: width 1s linear;
+        }
+
+        .withdraw-methods {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .method-card {
+            flex: 1;
+            min-width: 120px;
+            max-width: 200px;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+        }
+
+        .method-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .method-card.selected {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .method-card i {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .method-card span {
+            display: block;
+            font-size: 0.9rem;
+        }
+
+        .withdraw-form {
+            max-width: 400px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #withdrawButton {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-top: 15px;
+            transition: background-color 0.3s ease;
+        }
+
+        #withdrawButton:hover {
+            background-color: var(--primary-color-dark);
+        }
+
+        #withdrawButton i {
+            margin-left: 8px;
+        }
+
+        .popup-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            background-color: var(--card-bg);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px var(--shadow-color);
+            text-align: center;
+            z-index: 10000;
+            max-width: 90%;
+            width: 350px;
+            animation: popupIn 0.3s ease forwards;
+        }
+
+        .popup.error {
+            border-top: 5px solid var(--error-color);
+        }
+
+        .popup.success {
+            border-top: 5px solid var(--primary-color);
+        }
+
+        .popup.show {
+            display: block;
+        }
+
+        .popup-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .popup.error .popup-icon {
+            color: var(--error-color);
+        }
+
+        .popup.success .popup-icon {
+            color: var(--primary-color);
+        }
+
+        .popup h3 {
+            margin: 10px 0;
+            color: var(--text-color);
+        }
+
+        .popup p {
+            color: var(--text-color);
+            margin: 15px 0;
+            line-height: 1.5;
+        }
+
+        .popup .close-button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: auto;
+            min-width: 120px;
+            margin: 15px auto 0;
+        }
+
+        .popup .close-button:hover {
+            background-color: var(--primary-color-dark);
+            transform: translateY(-2px);
+        }
+
+        .popup.error .close-button {
+            background-color: var(--error-color);
+        }
+
+        .popup.error .close-button:hover {
+            background-color: var(--error-color-dark);
+        }
+
+        .popup {
+            transition: all 0.3s ease;
+        }
+
+        .popup.closing {
+            opacity: 0;
+            transform: translate(-50%, -40%);
+        }
+
+        .popup-overlay.closing {
+            opacity: 0;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes popupIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        .achievements {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .achievement {
+            text-align: center;
+            padding: 10px;
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 2px 5px var(--shadow-color);
+        }
+
+        .achievement i {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+
+            .login-header h1, .user-header h2 {
+                font-size: 1.3rem;
+            }
+
+            .theme-toggle {
+                width: 35px;
+                height: 35px;
+            }
+
+            .theme-toggle i {
+                font-size: 1rem;
+            }
+
+            .card {
+                padding: 15px;
+            }
+
+            .login-header, .user-header {
+                padding: 0 5px;
+            }
+        }
+
+        .balance-section {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .transfer-timer {
+            margin-top: 10px;
+            color: var(--primary-color);
+            font-size: 0.9rem;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .transfer-timer i {
+            margin-left: 5px;
+            animation: rotate 2s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background-color: transparent;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .tab-button i {
+            margin-left: 8px;
+        }
+
+        .tab-button.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .tab-button:hover:not(.active) {
+            background-color: var(--hover-color);
+        }
+
+        .withdrawals-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            padding: 10px;
+        }
+
+        .withdrawal-item {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            animation: slideIn 0.3s ease;
+        }
+
+        .withdrawal-item .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .withdrawal-item .amount {
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .withdrawal-item .method {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--text-color-light);
+        }
+
+        .withdrawal-item .details {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .withdrawal-item .timer {
+            color: var(--primary-color);
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="login" class="card">
+            <div class="login-header">
+                <h1><i class="fas fa-coins"></i> مرحباً بك في WinCash</h1>
+                <button class="theme-toggle" id="themeToggleLogin">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+            <div class="input-group">
+                <i class="fas fa-user"></i>
+                <input type="text" id="username" placeholder="اسم المستخدم">
+            </div>
+            <div class="input-group">
+                <i class="fas fa-lock"></i>
+                <input type="password" id="password" placeholder="كلمة المرور">
+            </div>
+            <button id="loginButton"><i class="fas fa-sign-in-alt"></i> تسجيل الدخول</button>
+        </div>
+
+        <div id="dashboard" class="dashboard" style="display: none;">
+            <div class="tabs">
+                <button class="tab-button active" data-tab="main">
+                    <i class="fas fa-home"></i>
+                    الرئيسية
+                </button>
+                <button class="tab-button" data-tab="withdrawals">
+                    <i class="fas fa-history"></i>
+                    السحوبات
+                </button>
+            </div>
+
+            <div class="tab-content" id="mainTab">
+                <div class="card balance-card">
+                    <div class="user-header">
+                        <h2><i class="fas fa-user-circle"></i> مرحباً، <span id="usernameDisplay">علياء</span></h2>
+                        <button class="theme-toggle" id="themeToggleDashboard">
+                            <i class="fas fa-moon"></i>
+                        </button>
+                    </div>
+                    <div class="balance-section">
+                        <div class="balance-amount">
+                            <i class="fas fa-wallet"></i>
+                            <span>رصيدك الحالي: $</span>
+                            <span id="balance">0</span>
+                        </div>
+                        <div id="transferTimer" class="transfer-timer" style="display: none;">
+                            <i class="fas fa-clock"></i>
+                            <span>وقت التحويل المتبقي: </span>
+                            <span id="transferTime"></span>
+                        </div>
+                    </div>
+                    <!-- <p><i class="fas fa-money-bill-wave"></i> رصيدك الحالي</p> -->
+                </div>
+
+                <div class="card timer-card">
+                    <div class="timer-icon">
+                        <i class="fas fa-hourglass-half"></i>
+                    </div>
+                    <h3>الوقت المتبقي للمكافأة القادمة</h3>
+                    <div id="timer">00:00:00</div>
+                    <div class="progress-bar">
+                        <div class="progress" id="progress"></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="section-title">
+                        <i class="fas fa-money-check-alt"></i>
+                        <h3>طرق السحب</h3>
+                    </div>
+                    <div class="withdraw-methods">
+                        <div class="method-card" data-method="vodafone">
+                            <i class="fas fa-mobile-alt"></i>
+                            <span>Vodafone Cash</span>
+                        </div>
+                        <div class="method-card" data-method="orange">
+                            <i class="fas fa-mobile"></i>
+                            <span>Orange Cash</span>
+                        </div>
+                        <div class="method-card" data-method="paypal">
+                            <i class="fab fa-paypal"></i>
+                            <span>PayPal</span>
+                        </div>
+                    </div>
+                    <div class="withdraw-form" id="withdrawForm" style="display: none;">
+                        <div class="input-group">
+                            <input type="number" id="withdrawAmount" placeholder="المبلغ المراد سحبه" min="10">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+
+                        <div class="input-group" id="phoneInputGroup" style="display: none;">
+                            <input type="tel" id="withdrawPhone" placeholder="رقم الهاتف">
+                            <i class="fas fa-phone"></i>
+                        </div>
+
+                        <div class="input-group" id="emailInputGroup" style="display: none;">
+                            <input type="email" id="withdrawEmail" placeholder="البريد الإلكتروني">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+
+                        <button id="withdrawButton">
+                            <i class="fas fa-money-bill-transfer"></i>
+                            سحب الأموال
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="section-title">
+                        <i class="fas fa-trophy"></i>
+                        <h3>إنجازاتك</h3>
+                    </div>
+                    <div class="achievements">
+                        <div class="achievement">
+                            <i class="fas fa-star"></i>
+                            <p>مستوى 1</p>
+                        </div>
+                        <div class="achievement">
+                            <i class="fas fa-award"></i>
+                            <p>5 سحوبات</p>
+                        </div>
+                        <div class="achievement">
+                            <i class="fas fa-clock"></i>
+                            <p>7 أيام</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="withdrawalsTab" style="display: none;">
+                <h2><i class="fas fa-history"></i> سجل السحوبات</h2>
+                <div id="withdrawalsList" class="withdrawals-list">
+                    <!-- سيتم إضافة السحوبات هنا -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="popup-overlay" id="popupOverlay"></div>
+    
+    <div id="errorPopup" class="popup error">
+        <i class="fas fa-exclamation-circle popup-icon"></i>
+        <h3>خطأ!</h3>
+        <p id="errorMessage"></p>
+        <button onclick="closePopup('errorPopup')" class="close-button">
+            <i class="fas fa-times"></i>
+            إغلاق
+        </button>
+    </div>
+
+    <div id="successPopup" class="popup success">
+        <i class="fas fa-check-circle popup-icon"></i>
+        <h3>تم بنجاح!</h3>
+        <p id="successMessage"></p>
+        <button onclick="closePopup('successPopup')" class="close-button">
+            <i class="fas fa-check"></i>
+            حسناً
+        </button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginButton = document.getElementById('loginButton');
+            const dashboard = document.getElementById('dashboard');
+            const login = document.getElementById('login');
+            const balanceElement = document.getElementById('balance');
+            const timerElement = document.getElementById('timer');
+            const progressBar = document.getElementById('progress');
+            const withdrawForm = document.getElementById('withdrawForm');
+            const withdrawButton = document.getElementById('withdrawButton');
+            const methodCards = document.querySelectorAll('.method-card');
+            const phoneInput = document.getElementById('withdrawPhone');
+            const emailInput = document.getElementById('withdrawEmail');
+            const themeToggleLogin = document.getElementById('themeToggleLogin');
+            const themeToggleDashboard = document.getElementById('themeToggleDashboard');
+            
+            let balance = 0;
+            let timer = 10800; // 3 ساعات = 10800 ثانية
+            let timerInterval;
+
+            function setTheme(isDark) {
+                document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+                const icon = isDark ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+                if (themeToggleLogin) themeToggleLogin.innerHTML = icon;
+                if (themeToggleDashboard) themeToggleDashboard.innerHTML = icon;
+                localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            }
+
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            setTheme(savedTheme ? savedTheme === 'dark' : prefersDark);
+
+            [themeToggleLogin, themeToggleDashboard].forEach(button => {
+                if (button) {
+                    button.addEventListener('click', () => {
+                        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+                        setTheme(!isDark);
+                    });
+                }
+            });
+
+            if (loginButton) {
+                loginButton.addEventListener('click', function() {
+                    const username = document.getElementById('username').value;
+                    const password = document.getElementById('password').value;
+                    
+                    if (username === 'علياء' && password === 'password123') {
+                        login.style.display = 'none';
+                        dashboard.style.display = 'block';
+                        startTimer();
+                    } else {
+                        showPopup('error', 'خطأ في اسم المستخدم أو كلمة المرور');
+                    }
+                });
+            }
+
+            function startTimer() {
+                timerInterval = setInterval(() => {
+                    timer--;
+                    
+                    // تحويل الثواني إلى ساعات ودقائق وثواني
+                    const hours = Math.floor(timer / 3600);
+                    const minutes = Math.floor((timer % 3600) / 60);
+                    const seconds = timer % 60;
+                    
+                    // تنسيق العرض
+                    const timeDisplay = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                    document.getElementById('timer').textContent = timeDisplay;
+                    
+                    // تحديث شريط التقدم
+                    const progressBar = document.querySelector('.progress-bar');
+                    progressBar.style.width = (timer / 10800 * 100) + '%';
+                    
+                    if (timer <= 0) {
+                        clearInterval(timerInterval);
+                        const reward = 5; // 5 دولار
+                        balance += reward;
+                        balanceElement.textContent = balance;
+                        showPopup('success', `تهانينا! لقد ربحت ${reward}$`);
+                        timer = 10800; // إعادة تعيين المؤقت
+                        startTimer(); // إعادة تشغيل المؤقت
+                    }
+                }, 1000);
+            }
+
+            methodCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    // إزالة التحديد من جميع البطاقات
+                    methodCards.forEach(c => {
+                        c.classList.remove('selected');
+                    });
+                    
+                    // تحديد البطاقة المختارة
+                    this.classList.add('selected');
+                    
+                    // إظهار النموذج المناسب
+                    const method = this.getAttribute('data-method');
+                    const phoneGroup = document.getElementById('phoneInputGroup');
+                    const emailGroup = document.getElementById('emailInputGroup');
+                    
+                    // إخفاء جميع حقول الإدخال أولاً
+                    phoneGroup.style.display = 'none';
+                    emailGroup.style.display = 'none';
+                    
+                    // إظهار الحقل المناسب
+                    if (method === 'vodafone' || method === 'orange') {
+                        phoneGroup.style.display = 'block';
+                        document.getElementById('withdrawPhone').placeholder = 
+                            method === 'vodafone' ? 'رقم فودافون (يبدأ بـ 010)' : 'رقم اورانج (يبدأ بـ 012)';
+                    } else if (method === 'paypal') {
+                        emailGroup.style.display = 'block';
+                    }
+                    
+                    // إظهار نموذج السحب
+                    withdrawForm.style.display = 'block';
+                });
+            });
+
+            // معالجة السحب
+            if (withdrawButton) {
+                withdrawButton.addEventListener('click', function() {
+                    const amount = parseFloat(document.getElementById('withdrawAmount').value);
+                    const selectedCard = document.querySelector('.method-card.selected');
+                    const method = selectedCard ? selectedCard.getAttribute('data-method') : null;
+
+                    if (!method) {
+                        showPopup('error', 'يرجى اختيار طريقة السحب أولاً');
+                        return;
+                    }
+
+                    if (!amount || isNaN(amount)) {
+                        showPopup('error', 'يرجى إدخال المبلغ المراد سحبه');
+                        return;
+                    }
+
+                    if (amount > balance) {
+                        showPopup('error', 'عذراً، رصيدك غير كافي لإتمام عملية السحب');
+                        return;
+                    }
+
+                    if (amount < 300) {
+                        showPopup('error', 'الحد الأدنى للسحب هو 300 دولار');
+                        return;
+                    }
+
+                    if (balance < 300) {
+                        showPopup('error', 'عذراً، يجب أن يكون رصيدك 300 دولار على الأقل للسحب');
+                        return;
+                    }
+
+                    if (method === 'vodafone' || method === 'orange') {
+                        const phoneRegex = method === 'vodafone' ? /^010[0-9]{8}$/ : /^012[0-9]{8}$/;
+                        const phoneValue = document.getElementById('withdrawPhone').value.trim();
+                        if (!phoneRegex.test(phoneValue)) {
+                            showPopup('error', `يجب إدخال رقم ${method === 'vodafone' ? 'فودافون' : 'اورانج'} صحيح`);
+                            return;
+                        }
+                    } else if (method === 'paypal') {
+                        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                        const emailValue = document.getElementById('withdrawEmail').value.trim();
+                        if (!emailRegex.test(emailValue)) {
+                            showPopup('error', 'يرجى إدخال بريد إلكتروني صحيح');
+                            return;
+                        }
+                    }
+
+                    // إتمام عملية السحب
+                    balance -= amount;
+                    balanceElement.textContent = balance;
+
+                    // إضافة السحب الجديد
+                    const recipient = method === 'paypal' ? 
+                        document.getElementById('withdrawEmail').value :
+                        document.getElementById('withdrawPhone').value;
+                    
+                    // إضافة السحب إلى المصفوفة
+                    const withdrawal = {
+                        id: Date.now(),
+                        amount: amount,
+                        method: method,
+                        recipient: recipient,
+                        date: new Date(),
+                        remainingTime: 5 * 24 * 60 * 60 // 5 أيام بالثواني
+                    };
+                    
+                    // حفظ السحوبات في localStorage
+                    const savedWithdrawals = JSON.parse(localStorage.getItem('withdrawals') || '[]');
+                    savedWithdrawals.unshift(withdrawal);
+                    localStorage.setItem('withdrawals', JSON.stringify(savedWithdrawals));
+                    
+                    // تحديث واجهة السحوبات
+                    updateWithdrawalsList();
+
+                    // عرض رسالة النجاح
+                    let successMessage = `تهانينا! تم تنفيذ عملية السحب بنجاح!\n`;
+                    if (method === 'vodafone' || method === 'orange') {
+                        successMessage += `سيتم تحويل ${amount}$ إلى رقم ${recipient} خلال 4-5 أيام عمل.`;
+                    } else {
+                        successMessage += `سيتم تحويل ${amount}$ إلى حساب PayPal ${recipient} خلال 4-5 أيام عمل.`;
+                    }
+                    showPopup('success', successMessage);
+
+                    // إعادة تعيين النموذج
+                    withdrawForm.style.display = 'none';
+                    methodCards.forEach(card => card.classList.remove('selected'));
+                    document.getElementById('withdrawPhone').value = '';
+                    document.getElementById('withdrawEmail').value = '';
+                    document.getElementById('withdrawAmount').value = '';
+                });
+            }
+
+            // تحديث قائمة السحوبات
+            function updateWithdrawalsList() {
+                const listElement = document.getElementById('withdrawalsList');
+                if (!listElement) return;
+
+                // جلب السحوبات من localStorage
+                const savedWithdrawals = JSON.parse(localStorage.getItem('withdrawals') || '[]');
+                listElement.innerHTML = '';
+
+                if (savedWithdrawals.length === 0) {
+                    listElement.innerHTML = `
+                        <div class="no-withdrawals">
+                            <i class="fas fa-info-circle"></i>
+                            لا توجد عمليات سحب حتى الآن
+                        </div>
+                    `;
+                    return;
+                }
+
+                savedWithdrawals.forEach(withdrawal => {
+                    const methodIcon = withdrawal.method === 'paypal' ? 'fa-paypal' : 'fa-mobile-alt';
+                    const methodName = {
+                        'vodafone': 'فودافون كاش',
+                        'orange': 'أورانج كاش',
+                        'paypal': 'PayPal'
+                    }[withdrawal.method];
+
+                    const itemElement = document.createElement('div');
+                    itemElement.className = 'withdrawal-item';
+                    itemElement.innerHTML = `
+                        <div class="header">
+                            <div class="amount">$${withdrawal.amount}</div>
+                            <div class="method">
+                                <i class="fas ${methodIcon}"></i>
+                                ${methodName}
+                            </div>
+                        </div>
+                        <div class="details">
+                            <div>المستلم: ${withdrawal.recipient}</div>
+                            <div>تاريخ الطلب: ${new Date(withdrawal.date).toLocaleString('ar-EG')}</div>
+                            <div class="timer" id="timer-${withdrawal.id}">
+                                <i class="fas fa-clock"></i>
+                                جاري حساب الوقت المتبقي...
+                            </div>
+                        </div>
+                    `;
+                    listElement.appendChild(itemElement);
+                    startWithdrawalTimer(withdrawal.id, new Date(withdrawal.date));
+                });
+            }
+
+            // تحديث العداد لكل سحب
+            function startWithdrawalTimer(withdrawalId, startDate) {
+                const timerElement = document.getElementById(`timer-${withdrawalId}`);
+                if (!timerElement) return;
+
+                const endDate = new Date(startDate);
+                endDate.setDate(endDate.getDate() + 5); // إضافة 5 أيام
+
+                function updateTimer() {
+                    const now = new Date();
+                    const timeLeft = endDate - now;
+
+                    if (timeLeft <= 0) {
+                        clearInterval(timerInterval);
+                        timerElement.innerHTML = '<i class="fas fa-check-circle"></i> تم التحويل';
+                        return;
+                    }
+
+                    const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+                    timerElement.innerHTML = `
+                        <i class="fas fa-clock"></i>
+                        متبقي: ${days} يوم ${hours} ساعة ${minutes} دقيقة ${seconds} ثانية
+                    `;
+                }
+
+                updateTimer();
+                const timerInterval = setInterval(updateTimer, 1000);
+            }
+
+            // تحديث قائمة السحوبات عند تحميل الصفحة
+            document.addEventListener('DOMContentLoaded', function() {
+                updateWithdrawalsList();
+            });
+
+            // تحديث قائمة السحوبات عند النقر على تبويب السحوبات
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.addEventListener('click', () => {
+                    const tabId = button.getAttribute('data-tab');
+                    if (tabId === 'withdrawals') {
+                        updateWithdrawalsList();
+                    }
+                    
+                    // إزالة الفئة النشطة من جميع الأزرار
+                    document.querySelectorAll('.tab-button').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    
+                    // إضافة الفئة النشطة للزر المحدد
+                    button.classList.add('active');
+                    
+                    // إخفاء جميع المحتويات
+                    document.querySelectorAll('.tab-content').forEach(content => {
+                        content.style.display = 'none';
+                    });
+                    
+                    // إظهار المحتوى المحدد
+                    document.getElementById(tabId + 'Tab').style.display = 'block';
+                });
+            });
+
+            window.closePopup = function(popupId) {
+                const overlay = document.getElementById('popupOverlay');
+                const popup = document.getElementById(popupId);
+                
+                if (!overlay || !popup) {
+                    console.error('عناصر النافذة المنبثقة غير موجودة');
+                    return;
+                }
+
+                // إزالة الفئات وإخفاء العناصر مباشرة
+                popup.classList.remove('show');
+                overlay.style.display = 'none';
+            }
+
+            function showPopup(type, message) {
+                const overlay = document.getElementById('popupOverlay');
+                const popup = document.getElementById(type + 'Popup');
+                const messageElement = document.getElementById(type + 'Message');
+                
+                if (!overlay || !popup || !messageElement) {
+                    console.error('عناصر النافذة المنبثقة غير موجودة');
+                    return;
+                }
+
+                // إغلاق أي نوافذ منبثقة مفتوحة
+                document.querySelectorAll('.popup.show').forEach(p => {
+                    p.classList.remove('show');
+                });
+
+                messageElement.textContent = message;
+                overlay.style.display = 'block';
+                popup.classList.add('show');
+            }
+
+            // إضافة مستمع للنقر على الخلفية
+            document.getElementById('popupOverlay').addEventListener('click', function(e) {
+                // التأكد من أن النقر كان على الخلفية وليس على النافذة نفسها
+                if (e.target === this) {
+                    const visiblePopup = document.querySelector('.popup.show');
+                    if (visiblePopup) {
+                        closePopup(visiblePopup.id);
+                    }
+                }
+            });
+
+            startTimer();
+        });
+    </script>
+</body>
+</html>
